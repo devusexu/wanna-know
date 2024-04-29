@@ -1,6 +1,19 @@
 ```mermaid
 erDiagram
 
+USER ||--o{ POST: creates
+USER ||--o{ COMMENT: creates
+USER ||--o{ LIKE: ""
+USER ||--o{ SAVE: ""
+USER ||--o{ VOTE: ""
+POST ||--o{ LIKE: ""
+POST ||--o{ SAVE: ""
+WISH ||--o{ VOTE: ""
+POST||--o{ COMMENT: has
+POST||--o{ POST_HASHTAG: ""
+HASHTAG||--|{ POST_HASHTAG: ""
+
+
 USER {
     int id pk
     %% what else?
@@ -13,11 +26,8 @@ POST {
     date date
     enum category "專案經驗, etc."
     varchar(255) title
-    %% This is denormalization because likes is stored in both posts and likes
-    %% By doing this, when like/unlike we have to update this field and modify a record in likes
-    %% The benefit is when the frontend want to list the posts, it could get the likes here instead of query the likes table to calculate the likes for every post
-    int likes
     varchar(255) slide_link
+    int views
     text content
 }
 
@@ -30,27 +40,41 @@ COMMENT {
 
 HASHTAG {
     int id pk
-    varchar(255) text 
+    varchar(255) text
 }
 
+%% post_id have hashtag_id
 POST_HASHTAG {
     int id pk
     int hashtag_id fk
     int post_id fk
 }
 
+%% user_id likes post_id
 LIKE {
-    %% when a user click like button, create a record(like) or delete a record(unlike) 
     int id pk
-    int post_id fk
     int user_id fk
+    int post_id fk
 }
 
 WISH {
     int id pk
     varchar(255) topic
-    int votes 
+    int votes
 }
 
+%% user_id votes on wish_id
+VOTE {
+    int id pk
+    int user_id fk
+    int wish_id fk
+}
+
+%% user_id saves post_id
+SAVE {
+    int id pk
+    int user_id fk
+    int post_id fk
+}
 
 ```
